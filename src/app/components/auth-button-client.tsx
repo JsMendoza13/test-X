@@ -1,11 +1,14 @@
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useState, useEffect } from "react";
+import {
+  type Session,
+  createClientComponentClient,
+} from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
 
-export function AuthButton() {
-  const [session, SetSession] = useState<Session | null>(null);
+export function AuthButton({ session }: { session: Session | null }) {
   const supabase = createClientComponentClient();
+  const router = useRouter();
 
   const handleSignIn = async () => {
     await supabase.auth.signInWithOAuth({
@@ -18,15 +21,8 @@ export function AuthButton() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    router.refresh();
   };
-
-  useEffect(() => {
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      SetSession(data.session);
-    };
-    getSession();
-  }, []);
 
   return (
     <header>
